@@ -1,0 +1,75 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        SizeToContent="WidthAndHeight"
+        x:Class="RevolveTestDiaryXf.Views.MainWindow"
+        Title="RevolveTestDiaryXf"
+        xmlns:local="clr-namespace:Interfaces">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="auto"/>
+      <RowDefinition Height="800"/>
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="600"/>
+    </Grid.ColumnDefinitions>
+    <Button Command="{Binding SaveTestDayCommand}">Save to JSON</Button>
+    <DataGrid CanUserSortColumns="True" Items="{Binding TestDays}" Grid.Row="1" Focusable="False" CanUserResizeColumns="True" Height="800">
+      <DataGrid.Columns>
+        <DataGridTemplateColumn Width="*" Header="Test days">
+          <DataTemplate>
+            <Expander Header="{Binding Timestamp}" ExpandDirection="Down">
+              <StackPanel Orientation="Vertical">
+                <Expander Header="Goals" ExpandDirection="Down">
+                  <StackPanel Orientation="Vertical">
+                    <DataGrid CanUserSortColumns="False" Items="{Binding Goals}" AutoGenerateColumns="True" Margin="20,0,0,0"/>
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
+                      <TextBox Text="{Binding NewGoalBody}" Watermark="New goal" MinWidth="400"/>
+                      <Button Command="{Binding AddGoalCommand}" FontFamily="Bold">+</Button>
+                    </StackPanel>
+                  </StackPanel>
+                </Expander>
+                <Expander Header="Sessions" ExpandDirection="Down" >
+                  <StackPanel Orientation="Vertical" Margin="20,0,0,0">
+                    <DataGrid CanUserSortColumns="False" Items="{Binding Sessions}" HeadersVisibility="None">
+                      <DataGrid.Columns>
+                        <DataGridTemplateColumn Width="*">
+                          <DataTemplate>
+                            <Expander ExpandDirection="Down" Header="{Binding Title}">
+                              <StackPanel Orientation="Vertical" Margin="20,0,0,0">
+                                <DataGrid CanUserSortColumns="False" Items="{Binding SessionEntries}" AutoGenerateColumns="True">
+                                  <DataGrid.Columns>
+                                    <DataGridTemplateColumn>
+                                      <DataTemplate>
+                                        <TextBlock Text="{Binding Timestamp}" VerticalAlignment="Center"/>
+                                      </DataTemplate>
+                                    </DataGridTemplateColumn>
+                                  </DataGrid.Columns>
+                                </DataGrid>
+                                <StackPanel Orientation="Horizontal">
+                                  <ComboBox Items="{Binding EntryTypes}" SelectedItem="{Binding NewEntryType}"/>
+                                  <TextBox Text="{Binding NewEntryBody}" Watermark="New goal" MinWidth="400"/>
+                                  <Button Command="{Binding AddDiaryEntryCommand}" FontFamily="Bold">+</Button>
+                                </StackPanel>
+                              </StackPanel>
+                            </Expander>
+                          </DataTemplate>
+                        </DataGridTemplateColumn>
+                      </DataGrid.Columns>
+                    </DataGrid>
+                    <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
+                      <TextBox Text="{Binding NewSessionTitle}" Watermark="New session" MinWidth="400"/>
+                      <Button Command="{Binding AddSessionCommand}" FontFamily="Bold">+</Button>
+                    </StackPanel>
+                  </StackPanel>
+                </Expander>
+              </StackPanel>
+            </Expander>
+          </DataTemplate>
+        </DataGridTemplateColumn>
+      </DataGrid.Columns>
+    </DataGrid>
+  </Grid>
+</Window>
