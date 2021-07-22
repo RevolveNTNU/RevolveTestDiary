@@ -3,15 +3,44 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Nullable>enable</Nullable>
-    <ApplicationIcon />
+    <ApplicationIcon>rtd_xf.ico</ApplicationIcon>
     <StartupObject />
+    <PackageIcon>rtd_xf.png</PackageIcon>
+    <PackageIconUrl />
+    <Version>2.0.0</Version>
+    <PackageId>Revolve Test Diary</PackageId>
+    <Authors>Revolve NTNU</Authors>
+    <Company>Revolve NTNU</Company>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningLevel>5</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Resources\addday_icon.png" />
+    <None Remove="Resources\addentry_icon.png" />
+    <None Remove="Resources\addnote_icon.png" />
+    <None Remove="Resources\star_icon.png" />
+    <None Include="Resources\rtd_xf.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\addday_icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\addentry_icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\addnote_icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\star_icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Avalonia" Version="0.10.6" />
-    <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.6" />
     <PackageReference Include="Avalonia.Desktop" Version="0.10.6" />
     <PackageReference Include="Avalonia.Diagnostics" Version="0.10.6" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.6" />

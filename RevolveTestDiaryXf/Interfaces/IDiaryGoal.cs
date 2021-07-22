@@ -8,6 +8,7 @@ namespace RevolveTestDiaryXf.Interfaces
 {
     public interface IDiaryGoal
     {
+        event EventHandler<IDiaryGoal> TriggerAutoSaveEvent;
         bool Achieved { get; set; }
 
         string Goal { get; set; }

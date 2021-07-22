@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using Microsoft.VisualBasic.FileIO;
 using ReactiveUI;
 using RevolveTestDiaryXf.Interfaces;
 using RevolveTestDiaryXf.Models;
@@ -32,31 +33,51 @@ namespace RevolveTestDiaryXf.ViewModels
 
         public MainWindowViewModel()
         {
-            TestDays = new ObservableCollection<ITestDay>{
-                new TestDay(new TestLocation("NONE"), new Person("ESO/ASR"))
+            var testDay = new TestDay(new TestLocation("NONE"), new Person("ESO/ASR"));
+            testDay.TriggerAutoSaveEvent += SaveTestDay;
+            TestDays = new ObservableCollection<ITestDay>
+            {
+                testDay
             };
         }
 
-        public async void SaveTestDayCommand()
+        public async void SaveTestDay(object sender, ITestDay testDay)
         {
-            var file = await GetJsonFileName();
+            var folder = Path.Combine(SpecialDirectories.MyDocuments, "RevolveTestDiary");
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
 
-            if (file == null || TestDays.Count == 0)
+            var file = testDay.Timestamp.ToString("d-MM-yy_HH-mm-ss") + ".json";
+
+            if (file == null || testDay == null)
                 return;
-
-            var testDay = TestDays.First() as TestDay;
 
             var options = new JsonSerializerOptions { WriteIndented = true };
             var jsonString = JsonSerializer.Serialize(testDay, options);
 
-            await File.WriteAllTextAsync(file, jsonString);
+            await File.WriteAllTextAsync(Path.Combine(folder, file), jsonString);
         }
 
-        private async Task<string> GetJsonFileName()
+        public void SaveAllTestDaysCommand()
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filters.Add(new FileDialogFilter() { Name = "JSON", Extensions = { "json" } });
-            return await saveFileDialog.ShowAsync(MainWindow.Instance).ConfigureAwait(false);
+            foreach (var testDay in TestDays)
+            {
+                SaveTestDay(this, testDay);
+            }
+        }
+
+        public void AddDebriefCommand()
+        {
+
+        }
+
+        public void NewDayCommand()
+        {
+            var testDay = new TestDay(new TestLocation("NONE"), new Person("ESO/ASR"));
+            testDay.TriggerAutoSaveEvent += SaveTestDay;
+            TestDays.Add(testDay);
         }
     }
 }

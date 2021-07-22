@@ -9,9 +9,12 @@ namespace RevolveTestDiaryXf.Interfaces
 {
     public interface ITestDay : IBaseDiaryEntry
     {
+        event EventHandler<ITestDay> TriggerAutoSaveEvent;
         IPerson EsoAsr { get; set; }
 
         ILocation Location { get; set; }
+
+        IDebrief Debrief { get; set; }
 
         ObservableCollection<IDiaryGoal> Goals { get; set; }
 

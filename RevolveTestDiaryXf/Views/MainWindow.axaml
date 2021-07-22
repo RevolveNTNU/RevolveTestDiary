@@ -1,75 +1,162 @@
-<Window xmlns="https://github.com/avaloniaui"
+<FluentWindow xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:imaging="clr-namespace:Avalonia.Media.Imaging;assembly=Avalonia.Visuals"
         mc:Ignorable="d"
-        SizeToContent="WidthAndHeight"
         x:Class="RevolveTestDiaryXf.Views.MainWindow"
         Title="RevolveTestDiaryXf"
-        xmlns:local="clr-namespace:Interfaces">
-  <Grid>
+        xmlns:local="clr-namespace:Interfaces" Height="1000" Width="960">
+  <Window.Styles>
+    <Style Selector="TabControl">
+      <Setter Property="Background" Value="#FFFFFF"/>
+    </Style>
+    <Style Selector="TabControl WrapPanel">
+      <Setter Property="Background" Value="#ffd700"/>
+    </Style>
+  </Window.Styles>
+  <Window.Resources>
+    <imaging:Bitmap x:Key="AddDayIcon">
+      <x:Arguments>
+        <x:String>Resources/addday_icon.png</x:String>
+      </x:Arguments>
+    </imaging:Bitmap>
+    <imaging:Bitmap x:Key="AddEntryIcon">
+      <x:Arguments>
+        <x:String>Resources/addentry_icon.png</x:String>
+      </x:Arguments>
+    </imaging:Bitmap>
+    <imaging:Bitmap x:Key="AddNoteIcon">
+      <x:Arguments>
+        <x:String>Resources/addnote_icon.png</x:String>
+      </x:Arguments>
+    </imaging:Bitmap>
+    <imaging:Bitmap x:Key="AddStarIcon">
+      <x:Arguments>
+        <x:String>Resources/star_icon.png</x:String>
+      </x:Arguments>
+    </imaging:Bitmap>
+  </Window.Resources>
+  <Window.KeyBindings>
+    <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveAllTestDaysCommand}"/>
+    <KeyBinding Gesture="Ctrl+N" Command="{Binding NewDayCommand}"/>
+  </Window.KeyBindings>
+  <Grid Background="#F0F0F0">
     <Grid.RowDefinitions>
-      <RowDefinition Height="auto"/>
-      <RowDefinition Height="800"/>
+      <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="600"/>
-    </Grid.ColumnDefinitions>
-    <Button Command="{Binding SaveTestDayCommand}">Save to JSON</Button>
-    <DataGrid CanUserSortColumns="True" Items="{Binding TestDays}" Grid.Row="1" Focusable="False" CanUserResizeColumns="True" Height="800">
-      <DataGrid.Columns>
-        <DataGridTemplateColumn Width="*" Header="Test days">
-          <DataTemplate>
-            <Expander Header="{Binding Timestamp}" ExpandDirection="Down">
+    <TabControl Items="{Binding TestDays}" Grid.Row="1">
+      <TabControl.ItemTemplate>
+        <DataTemplate>
+          <TextBlock Text="{Binding Timestamp}" FontSize="15" Foreground="Black"/>
+        </DataTemplate>
+      </TabControl.ItemTemplate>
+      <TabControl.ContentTemplate>
+        <DataTemplate>
+          <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Orientation="Vertical" Margin="5,0,20,0">
               <StackPanel Orientation="Vertical">
-                <Expander Header="Goals" ExpandDirection="Down">
-                  <StackPanel Orientation="Vertical">
-                    <DataGrid CanUserSortColumns="False" Items="{Binding Goals}" AutoGenerateColumns="True" Margin="20,0,0,0"/>
-                    <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
-                      <TextBox Text="{Binding NewGoalBody}" Watermark="New goal" MinWidth="400"/>
-                      <Button Command="{Binding AddGoalCommand}" FontFamily="Bold">+</Button>
-                    </StackPanel>
-                  </StackPanel>
-                </Expander>
-                <Expander Header="Sessions" ExpandDirection="Down" >
-                  <StackPanel Orientation="Vertical" Margin="20,0,0,0">
-                    <DataGrid CanUserSortColumns="False" Items="{Binding Sessions}" HeadersVisibility="None">
-                      <DataGrid.Columns>
-                        <DataGridTemplateColumn Width="*">
-                          <DataTemplate>
-                            <Expander ExpandDirection="Down" Header="{Binding Title}">
-                              <StackPanel Orientation="Vertical" Margin="20,0,0,0">
-                                <DataGrid CanUserSortColumns="False" Items="{Binding SessionEntries}" AutoGenerateColumns="True">
-                                  <DataGrid.Columns>
-                                    <DataGridTemplateColumn>
-                                      <DataTemplate>
-                                        <TextBlock Text="{Binding Timestamp}" VerticalAlignment="Center"/>
-                                      </DataTemplate>
-                                    </DataGridTemplateColumn>
-                                  </DataGrid.Columns>
-                                </DataGrid>
-                                <StackPanel Orientation="Horizontal">
-                                  <ComboBox Items="{Binding EntryTypes}" SelectedItem="{Binding NewEntryType}"/>
-                                  <TextBox Text="{Binding NewEntryBody}" Watermark="New goal" MinWidth="400"/>
-                                  <Button Command="{Binding AddDiaryEntryCommand}" FontFamily="Bold">+</Button>
-                                </StackPanel>
-                              </StackPanel>
-                            </Expander>
-                          </DataTemplate>
-                        </DataGridTemplateColumn>
-                      </DataGrid.Columns>
-                    </DataGrid>
-                    <StackPanel Orientation="Horizontal" Margin="20,0,0,0">
-                      <TextBox Text="{Binding NewSessionTitle}" Watermark="New session" MinWidth="400"/>
-                      <Button Command="{Binding AddSessionCommand}" FontFamily="Bold">+</Button>
-                    </StackPanel>
-                  </StackPanel>
-                </Expander>
+                <TextBlock Text="Goals" FontSize="20"/>
+                <ItemsControl Items="{Binding Goals}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Grid>
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="auto"/>
+                          <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <CheckBox IsChecked="{Binding Achieved}" Grid.Column="0" Margin="20,0,0,0"/>
+                        <TextBox Text="{Binding Goal}" Grid.Column="1" BorderThickness="0"/>
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                  </Grid.ColumnDefinitions>
+                  <TextBox Text="{Binding NewGoalBody}" Watermark="New goal" Grid.Column="0">
+                    <TextBox.KeyBindings>
+                      <KeyBinding Gesture="Enter" Command="{Binding AddGoalCommand}"/>
+                    </TextBox.KeyBindings>
+                  </TextBox>
+                  <Button Command="{Binding AddGoalCommand}" FontFamily="Bold" Grid.Column="1">+</Button>
+                </Grid>
               </StackPanel>
-            </Expander>
-          </DataTemplate>
-        </DataGridTemplateColumn>
-      </DataGrid.Columns>
-    </DataGrid>
+              <StackPanel Orientation="Vertical">
+                <TextBlock Text="Sessions" FontSize="20"/>
+                <ItemsControl Items="{Binding Sessions}" HorizontalAlignment="Stretch">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Expander ExpandDirection="Down" Header="{Binding Title}" HorizontalContentAlignment="Stretch">
+                        <StackPanel Orientation="Vertical" Margin="20,0,0,0">
+                          <ItemsControl Items="{Binding SessionEntries}">
+                            <ItemsControl.ItemTemplate>
+                              <DataTemplate>
+                                <Grid >
+                                  <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="5*"/>
+                                  </Grid.ColumnDefinitions>
+                                  <TextBox Text="{Binding TimestampString}" Grid.Column="0" BorderThickness="0"/>
+                                  <TextBox Text="{Binding EntryType}" Grid.Column="1" BorderThickness="0"/>
+                                  <TextBox Text="{Binding Body}" Grid.Column="2" BorderThickness="0"/>
+                                </Grid>
+                              </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                          </ItemsControl>
+                          <StackPanel Orientation="Horizontal">
+                            <Grid>
+                              <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                              </Grid.ColumnDefinitions>
+                              <ComboBox Items="{Binding EntryTypes}" SelectedItem="{Binding NewEntryType}" Grid.Column="0"/>
+                              <TextBox Text="{Binding NewEntryBody}" Watermark="New entry" Grid.Column="1" MinWidth="250">
+                                <TextBox.KeyBindings>
+                                  <KeyBinding Gesture="Enter" Command="{Binding AddDiaryEntryCommand}"/>
+                                </TextBox.KeyBindings>
+                              </TextBox>
+                              <Button Command="{Binding AddDiaryEntryCommand}" FontFamily="Bold" Grid.Column="2">+</Button>
+                            </Grid>
+                          </StackPanel>
+                        </StackPanel>
+                      </Expander>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Grid>
+                  <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                  </Grid.ColumnDefinitions>
+                  <TextBox Text="{Binding NewSessionTitle}" Watermark="New session" Grid.Column="0">
+                    <TextBox.KeyBindings>
+                      <KeyBinding Gesture="Enter" Command="{Binding AddSessionCommand}"/>
+                    </TextBox.KeyBindings>
+                  </TextBox>
+                  <Button Command="{Binding AddSessionCommand}" FontFamily="Bold" Grid.Column="1">+</Button>
+                </Grid>
+              </StackPanel>
+              <Expander Header="Debrief notes" FontSize="20">
+                <ContentControl DataContext="{Binding Debrief}">
+                  <StackPanel Orientation="Vertical">
+                    <TextBlock FontSize="15">What went well today?</TextBlock>
+                    <TextBox Text="{Binding WhatWentWell}" Height="150" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True"/>
+                    <TextBlock FontSize="15">What could have gone better today?</TextBlock>
+                    <TextBox Text="{Binding WhatCanBeImproved}" Height="150" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True"/>
+                    <TextBlock FontSize="15">What issues did we discover today?</TextBlock>
+                    <TextBox Text="{Binding IssuesDiscovered}" Height="150" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True"/>
+                  </StackPanel>
+                </ContentControl>
+              </Expander>
+            </StackPanel>
+          </ScrollViewer>
+        </DataTemplate>
+      </TabControl.ContentTemplate>
+    </TabControl>
   </Grid>
-</Window>
+</FluentWindow>

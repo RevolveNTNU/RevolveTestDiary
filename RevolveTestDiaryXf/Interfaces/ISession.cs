@@ -9,6 +9,7 @@ namespace RevolveTestDiaryXf.Interfaces
 {
     public interface ISession : IBaseDiaryEntry
     {
+        event EventHandler<ISession> TriggerAutoSaveEvent;
         string Title { get; set; }
         ObservableCollection<IDiaryEntry> SessionEntries { get; set; }
         void AddDiaryEntryCommand();

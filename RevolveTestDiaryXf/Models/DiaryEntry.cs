@@ -8,6 +8,8 @@ namespace RevolveTestDiaryXf.Models
     {
         public DateTime Timestamp { get; set; }
 
+        public string TimestampString => Timestamp.ToShortTimeString();
+
         public EntryType EntryType { get; set; }
 
         public string Body { get; set; }

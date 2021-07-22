@@ -27,6 +27,8 @@ namespace RevolveTestDiaryXf.Models
 
         private EntryType entryType;
 
+        public event EventHandler<ISession> TriggerAutoSaveEvent;
+
         public EntryType NewEntryType
         {
             get { return entryType; }
@@ -47,6 +49,7 @@ namespace RevolveTestDiaryXf.Models
             var diaryEntry = new DiaryEntry(NewEntryType, NewEntryBody);
             NewEntryBody = null;
             AddDiaryEntry(diaryEntry);
+            TriggerAutoSaveEvent?.Invoke(this, this);
         }
 
         public void AddDiaryEntry(IDiaryEntry entry)

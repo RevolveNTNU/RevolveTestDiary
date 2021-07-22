@@ -28,7 +28,6 @@ namespace RevolveTestDiaryXf
             {
                 Source = new Uri("avares://Avalonia.Themes.Fluent/FluentDark.xaml")
             },
-            DataGridFluent
         };
 
         public static Styles FluentLight = new Styles
@@ -37,7 +36,6 @@ namespace RevolveTestDiaryXf
             {
                 Source = new Uri("avares://Avalonia.Themes.Fluent/FluentLight.xaml")
             },
-            DataGridFluent
         };
 
         public static Styles DefaultLight = new Styles
@@ -62,7 +60,6 @@ namespace RevolveTestDiaryXf
             {
                 Source = new Uri("avares://Avalonia.Themes.Default/DefaultTheme.xaml")
             },
-            DataGridDefault
         };
 
         public static Styles DefaultDark = new Styles
@@ -87,12 +84,11 @@ namespace RevolveTestDiaryXf
             {
                 Source = new Uri("avares://Avalonia.Themes.Default/DefaultTheme.xaml")
             },
-            DataGridFluent
         };
 
         public override void Initialize()
         {
-            Styles.Insert(0, DefaultDark);
+            Styles.Insert(0, FluentDark);
 
             AvaloniaXamlLoader.Load(this);
         }
