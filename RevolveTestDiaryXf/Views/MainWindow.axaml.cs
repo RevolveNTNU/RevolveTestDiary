@@ -11,6 +11,7 @@ namespace RevolveTestDiaryXf.Views
         public MainWindow()
         {
             InitializeComponent();
+
             Instance = this;
 #if DEBUG
             this.AttachDevTools();

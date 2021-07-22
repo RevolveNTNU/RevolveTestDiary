@@ -1,4 +1,4 @@
-<FluentWindow xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -6,7 +6,8 @@
         mc:Ignorable="d"
         x:Class="RevolveTestDiaryXf.Views.MainWindow"
         Title="RevolveTestDiaryXf"
-        xmlns:local="clr-namespace:Interfaces" Height="1000" Width="960">
+        xmlns:local="clr-namespace:Interfaces" Height="1000" Width="960"
+        Icon="resm:RevolveTestDiaryXf.Resources.rtd_xf.ico">
   <Window.Styles>
     <Style Selector="TabControl">
       <Setter Property="Background" Value="#FFFFFF"/>
@@ -15,28 +16,6 @@
       <Setter Property="Background" Value="#ffd700"/>
     </Style>
   </Window.Styles>
-  <Window.Resources>
-    <imaging:Bitmap x:Key="AddDayIcon">
-      <x:Arguments>
-        <x:String>Resources/addday_icon.png</x:String>
-      </x:Arguments>
-    </imaging:Bitmap>
-    <imaging:Bitmap x:Key="AddEntryIcon">
-      <x:Arguments>
-        <x:String>Resources/addentry_icon.png</x:String>
-      </x:Arguments>
-    </imaging:Bitmap>
-    <imaging:Bitmap x:Key="AddNoteIcon">
-      <x:Arguments>
-        <x:String>Resources/addnote_icon.png</x:String>
-      </x:Arguments>
-    </imaging:Bitmap>
-    <imaging:Bitmap x:Key="AddStarIcon">
-      <x:Arguments>
-        <x:String>Resources/star_icon.png</x:String>
-      </x:Arguments>
-    </imaging:Bitmap>
-  </Window.Resources>
   <Window.KeyBindings>
     <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveAllTestDaysCommand}"/>
     <KeyBinding Gesture="Ctrl+N" Command="{Binding NewDayCommand}"/>
@@ -159,4 +138,4 @@
       </TabControl.ContentTemplate>
     </TabControl>
   </Grid>
-</FluentWindow>
+</Window>

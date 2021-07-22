@@ -4,38 +4,32 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Nullable>enable</Nullable>
     <ApplicationIcon>rtd_xf.ico</ApplicationIcon>
-    <StartupObject />
-    <PackageIcon>rtd_xf.png</PackageIcon>
+    <StartupObject>RevolveTestDiaryXf.Program</StartupObject>
+    <PackageIcon></PackageIcon>
     <PackageIconUrl />
-    <Version>2.0.0</Version>
-    <PackageId>Revolve Test Diary</PackageId>
+    <Version>2.1.0</Version>
+    <PackageId></PackageId>
     <Authors>Revolve NTNU</Authors>
     <Company>Revolve NTNU</Company>
+    <Win32Resource />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningLevel>5</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Resources\addday_icon.png" />
-    <None Remove="Resources\addentry_icon.png" />
-    <None Remove="Resources\addnote_icon.png" />
-    <None Remove="Resources\star_icon.png" />
-    <None Include="Resources\rtd_xf.png">
+    <None Remove="Resources\rtd_xf.ico" />
+    <None Remove="Resources\rtd_xf.png" />
+    <None Remove="rtd_xf.ico" />
+    <EmbeddedResource Include="Resources\rtd_xf.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
-    </None>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\addday_icon.png">
+    <EmbeddedResource Include="Resources\rtd_xf.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\addentry_icon.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\addnote_icon.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\star_icon.png">
+    <EmbeddedResource Include="rtd_xf.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
@@ -45,5 +39,6 @@
     <PackageReference Include="Avalonia.Diagnostics" Version="0.10.6" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.6" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Uno.UI" Version="3.8.13" />
    </ItemGroup>
 </Project>
