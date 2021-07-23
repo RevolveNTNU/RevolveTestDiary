@@ -1,24 +1,22 @@
 ﻿using ReactiveUI;
 using RevolveTestDiaryXf.Enums;
-using RevolveTestDiaryXf.Interfaces;
 using RevolveTestDiaryXf.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 namespace RevolveTestDiaryXf.Models
 {
-    public class Session : ViewModelBase, ISession
+    public class Session : ViewModelBase
     {
         public DateTime Timestamp { get; set; }
+
         public string Title { get; set; }
-        public ObservableCollection<IDiaryEntry> SessionEntries { get; set; }
+        public ObservableCollection<DiaryEntry> SessionEntries { get; set; }
 
         private string newEntryBody;
-
+        [JsonIgnore]
         public string NewEntryBody
         {
             get { return newEntryBody; }
@@ -27,22 +25,25 @@ namespace RevolveTestDiaryXf.Models
 
         private EntryType entryType;
 
-        public event EventHandler<ISession> TriggerAutoSaveEvent;
-
+        public event EventHandler<Session> TriggerAutoSaveEvent;
+        [JsonIgnore]
         public EntryType NewEntryType
         {
             get { return entryType; }
             set { entryType = value; }
         }
 
+        [JsonIgnore]
         public ObservableCollection<EntryType> EntryTypes => new ObservableCollection<EntryType>(Enum.GetValues(typeof(EntryType)).Cast<EntryType>());
 
         public Session(string title)
         {
             Timestamp = DateTime.Now;
             Title = title;
-            SessionEntries = new ObservableCollection<IDiaryEntry>();
+            SessionEntries = new ObservableCollection<DiaryEntry>();
         }
+
+        public Session() { }
 
         public void AddDiaryEntryCommand()
         {
@@ -52,7 +53,7 @@ namespace RevolveTestDiaryXf.Models
             TriggerAutoSaveEvent?.Invoke(this, this);
         }
 
-        public void AddDiaryEntry(IDiaryEntry entry)
+        public void AddDiaryEntry(DiaryEntry entry)
         {
             SessionEntries.Add(entry);
             this.RaisePropertyChanged(nameof(SessionEntries));

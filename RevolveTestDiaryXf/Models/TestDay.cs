@@ -1,46 +1,50 @@
-﻿using Avalonia.Controls.Selection;
+﻿using Avalonia.Controls;
 using ReactiveUI;
-using RevolveTestDiaryXf.Interfaces;
 using RevolveTestDiaryXf.ViewModels;
+using RevolveTestDiaryXf.Views;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Text;
+using System.Text.Json.Serialization;
 
 namespace RevolveTestDiaryXf.Models
 {
-    public class TestDay : ViewModelBase, ITestDay
+    public class TestDay : ViewModelBase
     {
         public DateTime Timestamp { get; set; }
 
-        public IPerson EsoAsr { get; set; }
+        public Person EsoAsr { get; set; }
 
-        public ILocation Location { get; set; }
-        public IDebrief Debrief { get; set; }
+        public TestLocation Location { get; set; }
+        public Debrief Debrief { get; set; }
 
-        public ObservableCollection<IDiaryGoal> Goals { get; set; }
-        public SelectionModel<IDiaryGoal> SelectionGoals { get; }
+        public ObservableCollection<DiaryGoal> Goals { get; set; }
 
         private string newGoalBody;
 
+        [JsonIgnore]
         public string NewGoalBody
         {
             get { return newGoalBody; }
             set { this.RaiseAndSetIfChanged(ref newGoalBody, value); }
         }
 
-        public ObservableCollection<ISession> Sessions { get; set; }
+        public ObservableCollection<Session> Sessions { get; set; }
 
         private string newSessionTitle;
 
-        public event EventHandler<ITestDay> TriggerAutoSaveEvent;
+        public event EventHandler<TestDay> TriggerAutoSaveEvent;
+        public event EventHandler<TestDay> CloseTestDayEvent;
 
+        [JsonIgnore]
         public string NewSessionTitle
         {
             get { return newSessionTitle; }
             set { this.RaiseAndSetIfChanged(ref newSessionTitle, value); }
         }
 
-        public TestDay(ILocation location, IPerson esoAsr)
+        public TestDay(TestLocation location, Person esoAsr)
         {
             Location = location;
             Timestamp = DateTime.Now;
@@ -48,17 +52,25 @@ namespace RevolveTestDiaryXf.Models
             Debrief = new Debrief();
             Debrief.TriggerAutoSaveEvent += TriggerAutoSaveFromDebrief;
 
-            Goals = new ObservableCollection<IDiaryGoal>();
-            Sessions = new ObservableCollection<ISession>();
-            SelectionGoals = new SelectionModel<IDiaryGoal>();
-            SelectionGoals.SelectionChanged += SelectionGoalsChanged;
-
+            Goals = new ObservableCollection<DiaryGoal>();
+            Sessions = new ObservableCollection<Session>();
         }
 
-
-        private void SelectionGoalsChanged(object? sender, SelectionModelSelectionChangedEventArgs<IDiaryGoal> e)
+        public TestDay(DateTime timestamp, Person esoAsr, TestLocation location, Debrief debrief, ObservableCollection<DiaryGoal> goals, string newGoalBody, ObservableCollection<Session> sessions, string newSessionTitle)
         {
-            return;
+            Timestamp = timestamp;
+            EsoAsr = esoAsr;
+            Location = location;
+            Debrief = debrief;
+            Goals = goals;
+            NewGoalBody = newGoalBody;
+            Sessions = sessions;
+            NewSessionTitle = newSessionTitle;
+        }
+
+        public TestDay()
+        {
+
         }
 
         public void AddGoalCommand()
@@ -69,7 +81,7 @@ namespace RevolveTestDiaryXf.Models
             AddGoal(goal);
             TriggerAutoSaveEvent.Invoke(this, this);
         }
-        public void AddGoal(IDiaryGoal goal)
+        public void AddGoal(DiaryGoal goal)
         {
             Goals.Add(goal);
             this.RaisePropertyChanged(nameof(Goals));
@@ -84,25 +96,78 @@ namespace RevolveTestDiaryXf.Models
             TriggerAutoSaveEvent.Invoke(this, this);
         }
 
-        private void TriggerAutoSaveFromSession(object? sender, ISession e)
+        private void TriggerAutoSaveFromSession(object? sender, Session e)
         {
             TriggerAutoSaveEvent.Invoke(this, this);
         }
 
-        private void TriggerAutoSaveFromGoal(object? sender, IDiaryGoal e)
+        private void TriggerAutoSaveFromGoal(object? sender, DiaryGoal e)
         {
             TriggerAutoSaveEvent.Invoke(this, this);
         }
 
-        private void TriggerAutoSaveFromDebrief(object? sender, IDebrief e)
+        private void TriggerAutoSaveFromDebrief(object? sender, Debrief e)
         {
             TriggerAutoSaveEvent.Invoke(this, this);
         }
 
-        public void AddSession(ISession session)
+        public void AddSession(Session session)
         {
             Sessions.Add(session);
             this.RaisePropertyChanged(nameof(Sessions));
+        }
+
+        public void CloseTestDay()
+        {
+            CloseTestDayEvent?.Invoke(this, this);
+        }
+
+        public async void ExportToMarkdown()
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+            saveFileDialog.Filters.Add(new FileDialogFilter() { Name = "MarkDown", Extensions = { "md" } });
+            var fileName = await saveFileDialog.ShowAsync(MainWindow.Instance);
+            if (fileName == null)
+                return;
+
+            var stringBuilder = new StringBuilder();
+
+            stringBuilder.AppendLine($"# {Timestamp}");
+            stringBuilder.AppendLine("");
+            // Goals
+            stringBuilder.AppendLine($"## Goals");
+            foreach (var goal in Goals)
+            {
+                stringBuilder.AppendLine($"- [{(goal.Achieved ? "X" : " ")}] {goal.Goal}");
+            }
+            stringBuilder.AppendLine("");
+            // Sessions
+            stringBuilder.AppendLine($"## Sessions");
+            foreach (var session in Sessions)
+            {
+                stringBuilder.AppendLine($"### {session.Timestamp} - {session.Title}");
+
+                foreach (var entry in session.SessionEntries)
+                {
+                    var tabs = entry.EntryType == Enums.EntryType.EVENT || entry.EntryType == Enums.EntryType.ISSUE ? "\t\t" : "\t";
+                    stringBuilder.AppendLine($"* {entry.Timestamp} - {entry.EntryType}:{tabs}{entry.Body}");
+                }
+                stringBuilder.AppendLine("");
+            }
+
+            //Debrief
+            stringBuilder.AppendLine($"## Debrief");
+            stringBuilder.AppendLine("");
+            stringBuilder.AppendLine("### What went well today?");
+            stringBuilder.AppendLine(Debrief.WhatWentWell);
+            stringBuilder.AppendLine("");
+            stringBuilder.AppendLine("### What can be improved on from today?");
+            stringBuilder.AppendLine(Debrief.WhatCanBeImproved);
+            stringBuilder.AppendLine("");
+            stringBuilder.AppendLine("### What issues did we discover?");
+            stringBuilder.AppendLine(Debrief.IssuesDiscovered);
+
+            File.WriteAllTextAsync(fileName, stringBuilder.ToString());
         }
     }
 }

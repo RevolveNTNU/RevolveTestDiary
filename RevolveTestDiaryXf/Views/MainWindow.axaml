@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         x:Class="RevolveTestDiaryXf.Views.MainWindow"
         Title="RevolveTestDiaryXf"
-        xmlns:local="clr-namespace:Interfaces" Height="1000" Width="960"
+        xmlns:local="clr-namespace:Interfaces" Height="700" Width="960"
         Icon="resm:RevolveTestDiaryXf.Resources.rtd_xf.ico">
   <Window.Styles>
     <Style Selector="TabControl">
@@ -19,15 +19,29 @@
   <Window.KeyBindings>
     <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveAllTestDaysCommand}"/>
     <KeyBinding Gesture="Ctrl+N" Command="{Binding NewDayCommand}"/>
+    <KeyBinding Gesture="Ctrl+O" Command="{Binding LoadTestDayFromFileCommand}"/>
+    <KeyBinding Gesture="Ctrl+E" Command="{Binding ExportTestDayCommand}"/>
   </Window.KeyBindings>
   <Grid Background="#F0F0F0">
     <Grid.RowDefinitions>
+      <RowDefinition Height="auto"/>
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
-    <TabControl Items="{Binding TestDays}" Grid.Row="1">
+    <StackPanel Orientation="Horizontal" Grid.Row="0">
+      <Button Command="{Binding SaveAllTestDaysCommand}" FontSize="10" BorderThickness="0" ToolTip.Tip="Ctrl+S">Save all TestDays</Button>
+      <Button Command="{Binding NewDayCommand}" FontSize="10" BorderThickness="0" ToolTip.Tip="Ctrl+N">Create a new TestDay</Button>
+      <Button Command="{Binding LoadTestDayFromFileCommand}" FontSize="10" BorderThickness="0" ToolTip.Tip="Ctrl+O">Load a TestDay</Button>
+      <Button Command="{Binding ExportTestDayCommand}" FontSize="10" BorderThickness="0" ToolTip.Tip="Ctrl+E">Export selected TestDay</Button>
+    </StackPanel>
+    <TabControl Items="{Binding TestDays}" SelectedItem="{Binding SelectedTestDay}" Grid.Row="1">
       <TabControl.ItemTemplate>
         <DataTemplate>
-          <TextBlock Text="{Binding Timestamp}" FontSize="15" Foreground="Black"/>
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="{Binding Timestamp}" FontSize="15" Foreground="Black" VerticalAlignment="Center"/>
+            <Button BorderThickness="0" Background="Transparent" Command="{Binding CloseTestDay}">
+              <TextBlock FontWeight="Bold" Foreground="Black">X</TextBlock>
+            </Button>
+          </StackPanel>
         </DataTemplate>
       </TabControl.ItemTemplate>
       <TabControl.ContentTemplate>
@@ -80,7 +94,7 @@
                                     <ColumnDefinition Width="5*"/>
                                   </Grid.ColumnDefinitions>
                                   <TextBox Text="{Binding TimestampString}" Grid.Column="0" BorderThickness="0"/>
-                                  <TextBox Text="{Binding EntryType}" Grid.Column="1" BorderThickness="0"/>
+                                  <ComboBox Items="{Binding EntryTypes}" SelectedItem="{Binding EntryType}" Grid.Column="1" BorderThickness="0"/>
                                   <TextBox Text="{Binding Body}" Grid.Column="2" BorderThickness="0"/>
                                 </Grid>
                               </DataTemplate>
@@ -124,11 +138,11 @@
                 <ContentControl DataContext="{Binding Debrief}">
                   <StackPanel Orientation="Vertical">
                     <TextBlock FontSize="15">What went well today?</TextBlock>
-                    <TextBox Text="{Binding WhatWentWell}" Height="150" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True"/>
+                    <TextBox Text="{Binding WhatWentWell}" Height="150" TextWrapping="Wrap" AcceptsReturn="True"/>
                     <TextBlock FontSize="15">What could have gone better today?</TextBlock>
-                    <TextBox Text="{Binding WhatCanBeImproved}" Height="150" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True"/>
+                    <TextBox Text="{Binding WhatCanBeImproved}" Height="150" TextWrapping="Wrap" AcceptsReturn="True"/>
                     <TextBlock FontSize="15">What issues did we discover today?</TextBlock>
-                    <TextBox Text="{Binding IssuesDiscovered}" Height="150" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True"/>
+                    <TextBox Text="{Binding IssuesDiscovered}" Height="150" TextWrapping="Wrap" AcceptsReturn="True"/>
                   </StackPanel>
                 </ContentControl>
               </Expander>

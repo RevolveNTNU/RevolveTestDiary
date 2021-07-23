@@ -1,25 +1,19 @@
 ﻿using Avalonia.Controls;
 using Microsoft.VisualBasic.FileIO;
 using ReactiveUI;
-using RevolveTestDiaryXf.Interfaces;
 using RevolveTestDiaryXf.Models;
 using RevolveTestDiaryXf.Views;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace RevolveTestDiaryXf.ViewModels
 {
     class MainWindowViewModel : ViewModelBase
     {
-        private SynchronizationContext _syncContext = SynchronizationContext.Current;
+        private ObservableCollection<TestDay> testDays;
 
-        private ObservableCollection<ITestDay> testDays;
-
-        public ObservableCollection<ITestDay> TestDays
+        public ObservableCollection<TestDay> TestDays
         {
             get
             {
@@ -31,17 +25,27 @@ namespace RevolveTestDiaryXf.ViewModels
             }
         }
 
+        private TestDay _selectedTestDay;
+
+        public TestDay SelectedTestDay
+        {
+            get { return _selectedTestDay; }
+            set { _selectedTestDay = value; }
+        }
+
+
         public MainWindowViewModel()
         {
             var testDay = new TestDay(new TestLocation("NONE"), new Person("ESO/ASR"));
             testDay.TriggerAutoSaveEvent += SaveTestDay;
-            TestDays = new ObservableCollection<ITestDay>
+            testDay.CloseTestDayEvent += CloseTestDay;
+            TestDays = new ObservableCollection<TestDay>
             {
                 testDay
             };
         }
 
-        public async void SaveTestDay(object sender, ITestDay testDay)
+        public async void SaveTestDay(object sender, TestDay testDay)
         {
             var folder = Path.Combine(SpecialDirectories.MyDocuments, "RevolveTestDiary");
             if (!Directory.Exists(folder))
@@ -54,7 +58,7 @@ namespace RevolveTestDiaryXf.ViewModels
             if (file == null || testDay == null)
                 return;
 
-            var options = new JsonSerializerOptions { WriteIndented = true };
+            var options = new JsonSerializerOptions { WriteIndented = true, };
             var jsonString = JsonSerializer.Serialize(testDay, options);
 
             await File.WriteAllTextAsync(Path.Combine(folder, file), jsonString);
@@ -68,9 +72,33 @@ namespace RevolveTestDiaryXf.ViewModels
             }
         }
 
-        public void AddDebriefCommand()
+        public async void LoadTestDayFromFileCommand()
         {
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            var files = await openFileDialog.ShowAsync(MainWindow.Instance);
 
+            foreach (var file in files)
+            {
+                if (File.Exists(file))
+                {
+                    using (var stream = File.OpenRead(file))
+                    {
+                        if (stream != null)
+                        {
+                            try
+                            {
+                                TestDay testDay = await JsonSerializer.DeserializeAsync(stream, typeof(TestDay)) as TestDay;
+                                if (testDay != null)
+                                    TestDays.Add(testDay);
+                            }
+                            catch (JsonException e)
+                            {
+                                // Invalid JSON file, carry on I guess
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         public void NewDayCommand()
@@ -78,6 +106,19 @@ namespace RevolveTestDiaryXf.ViewModels
             var testDay = new TestDay(new TestLocation("NONE"), new Person("ESO/ASR"));
             testDay.TriggerAutoSaveEvent += SaveTestDay;
             TestDays.Add(testDay);
+        }
+
+        public void CloseTestDay(object sender, TestDay testDay)
+        {
+            if (testDay != null && TestDays.Contains(testDay))
+            {
+                TestDays.Remove(testDay);
+            }
+        }
+
+        public void ExportTestDayCommand()
+        {
+            SelectedTestDay?.ExportToMarkdown();
         }
     }
 }

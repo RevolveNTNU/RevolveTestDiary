@@ -1,11 +1,8 @@
-﻿using RevolveTestDiaryXf.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System;
 
 namespace RevolveTestDiaryXf.Models
 {
-    public class Debrief : IDebrief
+    public class Debrief
     {
         private string whatWentWell;
 
@@ -13,6 +10,14 @@ namespace RevolveTestDiaryXf.Models
         {
             get { return whatWentWell; }
             set { whatWentWell = value; TriggerAutoSaveEvent?.Invoke(this, this); }
+        }
+
+        public Debrief() { }
+        public Debrief(string whatWentWell, string whatCanBeImproved, string issuesDiscovered)
+        {
+            WhatWentWell = whatWentWell;
+            WhatCanBeImproved = whatCanBeImproved;
+            IssuesDiscovered = issuesDiscovered;
         }
 
         private string whatCanBeImproved;
@@ -32,6 +37,6 @@ namespace RevolveTestDiaryXf.Models
         }
 
 
-        public event EventHandler<IDebrief> TriggerAutoSaveEvent;
+        public event EventHandler<Debrief> TriggerAutoSaveEvent;
     }
 }

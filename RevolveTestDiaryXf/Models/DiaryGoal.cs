@@ -1,9 +1,8 @@
-﻿using RevolveTestDiaryXf.Interfaces;
-using System;
+﻿using System;
 
 namespace RevolveTestDiaryXf.Models
 {
-    public class DiaryGoal : IDiaryGoal
+    public class DiaryGoal
     {
         private bool achieved;
 
@@ -36,6 +35,10 @@ namespace RevolveTestDiaryXf.Models
             Achieved = false;
         }
 
-        public event EventHandler<IDiaryGoal> TriggerAutoSaveEvent;
+        public DiaryGoal()
+        {
+
+        }
+        public event EventHandler<DiaryGoal> TriggerAutoSaveEvent;
     }
 }
