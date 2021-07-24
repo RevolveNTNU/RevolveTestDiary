@@ -48,6 +48,7 @@ namespace RevolveTestDiaryXf.Models
         public void AddDiaryEntryCommand()
         {
             var diaryEntry = new DiaryEntry(NewEntryType, NewEntryBody);
+            diaryEntry.TriggerAutoSaveEvent += TriggerAutoSaveFromEntry;
             NewEntryBody = null;
             AddDiaryEntry(diaryEntry);
             TriggerAutoSaveEvent?.Invoke(this, this);
@@ -57,6 +58,12 @@ namespace RevolveTestDiaryXf.Models
         {
             SessionEntries.Add(entry);
             this.RaisePropertyChanged(nameof(SessionEntries));
+        }
+
+
+        public void TriggerAutoSaveFromEntry(object? sender, DiaryEntry e)
+        {
+            TriggerAutoSaveEvent?.Invoke(this, this);
         }
     }
 }

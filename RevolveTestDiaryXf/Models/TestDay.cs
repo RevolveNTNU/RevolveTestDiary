@@ -79,7 +79,7 @@ namespace RevolveTestDiaryXf.Models
             goal.TriggerAutoSaveEvent += TriggerAutoSaveFromGoal;
             NewGoalBody = null;
             AddGoal(goal);
-            TriggerAutoSaveEvent.Invoke(this, this);
+            TriggerAutoSaveEvent?.Invoke(this, this);
         }
         public void AddGoal(DiaryGoal goal)
         {
@@ -93,22 +93,27 @@ namespace RevolveTestDiaryXf.Models
             session.TriggerAutoSaveEvent += TriggerAutoSaveFromSession;
             NewSessionTitle = null;
             AddSession(session);
-            TriggerAutoSaveEvent.Invoke(this, this);
+            TriggerAutoSaveEvent?.Invoke(this, this);
         }
 
-        private void TriggerAutoSaveFromSession(object? sender, Session e)
+        public void TriggerAutoSaveFromSession(object? sender, Session e)
         {
-            TriggerAutoSaveEvent.Invoke(this, this);
+            TriggerAutoSaveEvent?.Invoke(this, this);
         }
 
-        private void TriggerAutoSaveFromGoal(object? sender, DiaryGoal e)
+        public void TriggerAutoSaveFromGoal(object? sender, DiaryGoal e)
         {
-            TriggerAutoSaveEvent.Invoke(this, this);
+            TriggerAutoSaveEvent?.Invoke(this, this);
         }
 
-        private void TriggerAutoSaveFromDebrief(object? sender, Debrief e)
+        public void TriggerAutoSaveFromDebrief(object? sender, Debrief e)
         {
-            TriggerAutoSaveEvent.Invoke(this, this);
+            TriggerAutoSaveEvent?.Invoke(this, this);
+        }
+
+        public void TriggerAutoSaveFromEntry(object? sender, DiaryEntry e)
+        {
+            TriggerAutoSaveEvent?.Invoke(this, this);
         }
 
         public void AddSession(Session session)

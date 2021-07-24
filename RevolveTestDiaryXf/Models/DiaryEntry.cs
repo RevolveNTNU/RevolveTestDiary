@@ -9,7 +9,7 @@ namespace RevolveTestDiaryXf.Models
     public class DiaryEntry
     {
         public DateTime Timestamp { get; set; }
-
+        public event EventHandler<DiaryEntry> TriggerAutoSaveEvent;
         public DiaryEntry(DateTime timestamp, EntryType entryType, string body)
         {
             Timestamp = timestamp;
@@ -25,9 +25,16 @@ namespace RevolveTestDiaryXf.Models
 
         [JsonIgnore]
         public ObservableCollection<EntryType> EntryTypes => new ObservableCollection<EntryType>(Enum.GetValues(typeof(EntryType)).Cast<EntryType>());
-        public EntryType EntryType { get; set; }
+        public EntryType EntryType { get => entryType; set { entryType = value; TriggerAutoSaveEvent?.Invoke(this, this); } }
 
-        public string Body { get; set; }
+        private string _body;
+        private EntryType entryType;
+
+        public string Body
+        {
+            get { return _body; }
+            set { _body = value; TriggerAutoSaveEvent?.Invoke(this, this); }
+        }
 
         public DiaryEntry(EntryType entryType, string body)
         {

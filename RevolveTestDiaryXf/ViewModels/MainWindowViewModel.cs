@@ -88,6 +88,25 @@ namespace RevolveTestDiaryXf.ViewModels
                             try
                             {
                                 TestDay testDay = await JsonSerializer.DeserializeAsync(stream, typeof(TestDay)) as TestDay;
+                                testDay.TriggerAutoSaveEvent += SaveTestDay;
+                                testDay.CloseTestDayEvent += CloseTestDay;
+
+                                foreach (var session in testDay.Sessions)
+                                {
+                                    session.TriggerAutoSaveEvent += testDay.TriggerAutoSaveFromSession;
+                                    foreach (var entry in session.SessionEntries)
+                                    {
+                                        entry.TriggerAutoSaveEvent += testDay.TriggerAutoSaveFromEntry;
+                                    }
+                                }
+                                foreach (var goal in testDay.Goals)
+                                {
+                                    goal.TriggerAutoSaveEvent += testDay.TriggerAutoSaveFromGoal;
+                                }
+
+                                testDay.Debrief.TriggerAutoSaveEvent += testDay.TriggerAutoSaveFromDebrief;
+
+
                                 if (testDay != null)
                                     TestDays.Add(testDay);
                             }
