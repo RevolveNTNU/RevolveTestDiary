@@ -3,14 +3,19 @@ using Microsoft.VisualBasic.FileIO;
 using ReactiveUI;
 using RevolveTestDiaryXf.Models;
 using RevolveTestDiaryXf.Views;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Net.Http;
 using System.Text.Json;
 
 namespace RevolveTestDiaryXf.ViewModels
 {
     class MainWindowViewModel : ViewModelBase
     {
+        private readonly HttpClient client = new HttpClient();
+
         private ObservableCollection<TestDay> testDays;
 
         public ObservableCollection<TestDay> TestDays
@@ -33,7 +38,7 @@ namespace RevolveTestDiaryXf.ViewModels
             set { _selectedTestDay = value; }
         }
 
-
+        public int TestPhaseId { get; set; }
         public MainWindowViewModel()
         {
             var testDay = new TestDay(new TestLocation("NONE"), new Person("ESO/ASR"));
@@ -138,6 +143,32 @@ namespace RevolveTestDiaryXf.ViewModels
         public void ExportTestDayCommand()
         {
             SelectedTestDay?.ExportToMarkdown();
+        }
+
+        public async void UploadTestDayToTestLog()
+        {
+            if (SelectedTestDay == null)
+                return;
+            var testDay = SelectedTestDay;
+            var options = new JsonSerializerOptions { WriteIndented = true, };
+            var jsonString = JsonSerializer.Serialize(testDay, options);
+
+            var data = new Dictionary<string, string>()
+            {
+                {"testday",  jsonString},
+                {"phaseId", TestPhaseId.ToString() }
+            };
+
+            var content = new FormUrlEncodedContent(data);
+            try
+            {
+                var response = await client.PostAsync("http://127.0.0.1:8000/testlog/register/exterallog/", content);
+                var responseString = await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception)
+            {
+
+            }
         }
     }
 }

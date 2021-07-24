@@ -21,10 +21,11 @@
     <KeyBinding Gesture="Ctrl+N" Command="{Binding NewDayCommand}"/>
     <KeyBinding Gesture="Ctrl+O" Command="{Binding LoadTestDayFromFileCommand}"/>
     <KeyBinding Gesture="Ctrl+E" Command="{Binding ExportTestDayCommand}"/>
+    <KeyBinding Gesture="Ctrl+U" Command="{Binding UploadTestDayToTestLog}"/>
   </Window.KeyBindings>
   <Grid Background="#F0F0F0">
     <Grid.RowDefinitions>
-      <RowDefinition Height="auto"/>
+      <RowDefinition Height="25"/>
       <RowDefinition Height="*"/>
     </Grid.RowDefinitions>
     <StackPanel Orientation="Horizontal" Grid.Row="0">
@@ -32,6 +33,9 @@
       <Button Command="{Binding NewDayCommand}" FontSize="10" BorderThickness="0" ToolTip.Tip="Ctrl+N">Create a new TestDay</Button>
       <Button Command="{Binding LoadTestDayFromFileCommand}" FontSize="10" BorderThickness="0" ToolTip.Tip="Ctrl+O">Load a TestDay</Button>
       <Button Command="{Binding ExportTestDayCommand}" FontSize="10" BorderThickness="0" ToolTip.Tip="Ctrl+E">Export selected TestDay</Button>
+      <TextBlock Margin="10,0,0,0" FontSize="10" VerticalAlignment="Center">Test phase ID:</TextBlock>
+      <TextBox Text="{Binding TestPhaseId}"  FontSize="10"  BorderThickness="0" Watermark="Phase ID" VerticalContentAlignment="Center"/>
+      <Button Command="{Binding UploadTestDayToTestLog}" FontSize="10" BorderThickness="0" ToolTip.Tip="Ctrl+U">Upload selected TestDay</Button>
     </StackPanel>
     <TabControl Items="{Binding TestDays}" SelectedItem="{Binding SelectedTestDay}" Grid.Row="1">
       <TabControl.ItemTemplate>
