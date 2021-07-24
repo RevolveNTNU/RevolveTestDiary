@@ -103,3 +103,7 @@ The FL tyre has some leaking
 #### Uploading to Revolve TestLog
 Your log can also be uploaded to Revolve Testlog: vault.revolve.no/testlog. This is done with the "Upload selected TestDay" button, or pressing Ctrl+U. In order for this to work, you will have to specify the Test Phase you want to add your log to. You can find this ID on Testlog's season page, as demonstrated in the screenshot below: 
 <img align=left src="https://raw.githubusercontent.com/RevolveNTNU/RevolveTestDiary/tribe/.github/testlog.png" width="100%"/>
+
+When uploading, a new TrackDay is created, and all your entries, debrief notes and goals are added to that TrackDay.
+
+<img align=left src="https://raw.githubusercontent.com/RevolveNTNU/RevolveTestDiary/tribe/.github/upload_testlog.png" width="100%"/>

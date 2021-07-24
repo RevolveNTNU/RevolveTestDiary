@@ -162,7 +162,7 @@ namespace RevolveTestDiaryXf.ViewModels
             var content = new FormUrlEncodedContent(data);
             try
             {
-                var response = await client.PostAsync("http://127.0.0.1:8000/testlog/register/exterallog/", content);
+                var response = await client.PostAsync("http://vault.revolve.no/testlog/register/exterallog/", content);
                 var responseString = await response.Content.ReadAsStringAsync();
             }
             catch (Exception)
