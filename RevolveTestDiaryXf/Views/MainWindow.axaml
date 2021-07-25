@@ -144,16 +144,33 @@
                   </Grid>
                 </StackPanel>
                 <Expander Header="Debrief notes" FontSize="20">
-                  <ContentControl DataContext="{Binding Debrief}">
-                    <StackPanel Orientation="Vertical">
-                      <TextBlock FontSize="15">What went well today?</TextBlock>
-                      <TextBox Text="{Binding WhatWentWell}" Height="150" TextWrapping="Wrap" AcceptsReturn="True"/>
-                      <TextBlock FontSize="15">What could have gone better today?</TextBlock>
-                      <TextBox Text="{Binding WhatCanBeImproved}" Height="150" TextWrapping="Wrap" AcceptsReturn="True"/>
-                      <TextBlock FontSize="15">What issues did we discover today?</TextBlock>
-                      <TextBox Text="{Binding IssuesDiscovered}" Height="150" TextWrapping="Wrap" AcceptsReturn="True"/>
-                    </StackPanel>
-                  </ContentControl>
+                  <StackPanel Orientation="Vertical">
+                    <ContentControl DataContext="{Binding Debrief}">
+                      <StackPanel Orientation="Vertical">
+                        <TextBlock FontSize="15">What went well today?</TextBlock>
+                        <TextBox Text="{Binding WhatWentWell}" Height="150" TextWrapping="Wrap" AcceptsReturn="True"/>
+                        <TextBlock FontSize="15">What could have gone better today?</TextBlock>
+                        <TextBox Text="{Binding WhatCanBeImproved}" Height="150" TextWrapping="Wrap" AcceptsReturn="True"/>
+                        <TextBlock FontSize="15">What issues did we discover today?</TextBlock>
+                        <TextBox Text="{Binding IssuesDiscovered}" Height="150" TextWrapping="Wrap" AcceptsReturn="True"/>
+                      </StackPanel>
+                    </ContentControl>
+                    <TextBlock Text="DV Checklist" FontSize="20"/>
+                    <ItemsControl Items="{Binding DvCheckList}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                          <Grid>
+                            <Grid.ColumnDefinitions>
+                              <ColumnDefinition Width="auto"/>
+                              <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <CheckBox IsChecked="{Binding Achieved}" Grid.Column="0" Margin="20,0,0,0"/>
+                            <TextBox Text="{Binding Goal}" Grid.Column="1" BorderThickness="0"/>
+                          </Grid>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </StackPanel>
                 </Expander>
               </StackPanel>
             </ScrollViewer>

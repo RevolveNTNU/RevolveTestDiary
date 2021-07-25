@@ -21,6 +21,7 @@ namespace RevolveTestDiaryXf.Models
         public Debrief Debrief { get; set; }
 
         public ObservableCollection<DiaryGoal> Goals { get; set; }
+        public ObservableCollection<DiaryGoal> DvCheckList { get; set; }
 
         private string newGoalBody;
 
@@ -55,6 +56,14 @@ namespace RevolveTestDiaryXf.Models
 
             Goals = new ObservableCollection<DiaryGoal>();
             Sessions = new ObservableCollection<Session>();
+            DvCheckList = new ObservableCollection<DiaryGoal>()
+            {
+                new DiaryGoal(){Goal="Disconnect Accu Wires"},
+                new DiaryGoal(){Goal="Put RES on charger"},
+                new DiaryGoal(){Goal="Put walkie-talkie on charger"},
+                new DiaryGoal(){Goal="Tidy up the PU"},
+                new DiaryGoal(){Goal="Upload Analyze logs"}
+            };
         }
 
         public TestDay(DateTime timestamp, Person esoAsr, TestLocation location, Debrief debrief, ObservableCollection<DiaryGoal> goals, string newGoalBody, ObservableCollection<Session> sessions, string newSessionTitle)
