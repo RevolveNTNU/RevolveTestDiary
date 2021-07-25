@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 
@@ -37,6 +38,23 @@ namespace RevolveTestDiaryXf.ViewModels
             get { return _selectedTestDay; }
             set { _selectedTestDay = value; }
         }
+
+        private bool _isDialogOpen;
+
+        public bool IsDialogOpen
+        {
+            get { return _isDialogOpen; }
+            set { this.RaiseAndSetIfChanged(ref _isDialogOpen, value); }
+        }
+
+        private string _dialogText;
+
+        public string DialogText
+        {
+            get { return _dialogText; }
+            set { this.RaiseAndSetIfChanged(ref _dialogText, value); }
+        }
+
 
         public int TestPhaseId { get; set; }
         public MainWindowViewModel()
@@ -140,9 +158,13 @@ namespace RevolveTestDiaryXf.ViewModels
             }
         }
 
-        public void ExportTestDayCommand()
+        public async void ExportTestDayCommand()
         {
-            SelectedTestDay?.ExportToMarkdown();
+            if (SelectedTestDay != null)
+            {
+                await SelectedTestDay.ExportToMarkdown();
+                OpenDialog("Testday exported to MarkDown");
+            }
         }
 
         public async void UploadTestDayToTestLog()
@@ -163,11 +185,28 @@ namespace RevolveTestDiaryXf.ViewModels
             try
             {
                 var response = await client.PostAsync("http://vault.revolve.no/testlog/register/exterallog/", content);
-                var responseString = await response.Content.ReadAsStringAsync();
+                var status = response.StatusCode;
+                if (status == HttpStatusCode.Created)
+                {
+                    OpenDialog($"Upload succesfull, with status code: {status}");
+                }
+                else
+                {
+                    OpenDialog($"Upload failed, with status code: {status}");
+                }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                OpenDialog($"Upload threw an exception: {e}");
+            }
+        }
 
+        private void OpenDialog(string message)
+        {
+            if (!IsDialogOpen)
+            {
+                DialogText = message;
+                IsDialogOpen = true;
             }
         }
     }

@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
 namespace RevolveTestDiaryXf.Models
 {
@@ -127,7 +128,7 @@ namespace RevolveTestDiaryXf.Models
             CloseTestDayEvent?.Invoke(this, this);
         }
 
-        public async void ExportToMarkdown()
+        public async Task ExportToMarkdown()
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filters.Add(new FileDialogFilter() { Name = "MarkDown", Extensions = { "md" } });
@@ -172,7 +173,7 @@ namespace RevolveTestDiaryXf.Models
             stringBuilder.AppendLine("### What issues did we discover?");
             stringBuilder.AppendLine(Debrief.IssuesDiscovered);
 
-            File.WriteAllTextAsync(fileName, stringBuilder.ToString());
+            await File.WriteAllTextAsync(fileName, stringBuilder.ToString());
         }
     }
 }
