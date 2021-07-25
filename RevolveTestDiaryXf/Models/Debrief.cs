@@ -4,7 +4,7 @@ namespace RevolveTestDiaryXf.Models
 {
     public class Debrief
     {
-        private string whatWentWell;
+        private string whatWentWell = "";
 
         public string WhatWentWell
         {
@@ -20,7 +20,7 @@ namespace RevolveTestDiaryXf.Models
             IssuesDiscovered = issuesDiscovered;
         }
 
-        private string whatCanBeImproved;
+        private string whatCanBeImproved = "";
 
         public string WhatCanBeImproved
         {
@@ -28,7 +28,7 @@ namespace RevolveTestDiaryXf.Models
             set { whatCanBeImproved = value; TriggerAutoSaveEvent?.Invoke(this, this); }
         }
 
-        private string issuesDiscovered;
+        private string issuesDiscovered = "";
 
         public string IssuesDiscovered
         {
