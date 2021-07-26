@@ -2,6 +2,7 @@
 using Microsoft.VisualBasic.FileIO;
 using ReactiveUI;
 using RevolveTestDiaryXf.Models;
+using RevolveTestDiaryXf.Services;
 using RevolveTestDiaryXf.Views;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,8 @@ namespace RevolveTestDiaryXf.ViewModels
         private readonly HttpClient client = new HttpClient();
 
         private ObservableCollection<TestDay> testDays;
+
+        private TrackWeatherService _trackWeatherService;
 
         public ObservableCollection<TestDay> TestDays
         {
@@ -59,7 +62,9 @@ namespace RevolveTestDiaryXf.ViewModels
         public int TestPhaseId { get; set; }
         public MainWindowViewModel()
         {
-            var testDay = new TestDay(new TestLocation("NONE"), new Person("ESO/ASR"));
+            var envSetup = JsonSerializer.Deserialize<EnvSetup>(File.ReadAllText("Resources/setup.env"));
+            _trackWeatherService = new TrackWeatherService(envSetup.OpenweatherKey);
+            var testDay = new TestDay(_trackWeatherService, new Person("ESO/ASR"));
             testDay.TriggerAutoSaveEvent += SaveTestDay;
             testDay.CloseTestDayEvent += CloseTestDay;
             TestDays = new ObservableCollection<TestDay>
@@ -145,7 +150,7 @@ namespace RevolveTestDiaryXf.ViewModels
 
         public void NewDayCommand()
         {
-            var testDay = new TestDay(new TestLocation("NONE"), new Person("ESO/ASR"));
+            var testDay = new TestDay(_trackWeatherService, new Person("ESO/ASR"));
             testDay.TriggerAutoSaveEvent += SaveTestDay;
             TestDays.Add(testDay);
         }

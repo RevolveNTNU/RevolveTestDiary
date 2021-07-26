@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using ReactiveUI;
+using RevolveTestDiaryXf.Services;
 using RevolveTestDiaryXf.ViewModels;
 using RevolveTestDiaryXf.Views;
 using System;
@@ -13,13 +14,10 @@ namespace RevolveTestDiaryXf.Models
 {
     public class TestDay : ViewModelBase
     {
+        private readonly TrackWeatherService _trackWeatherService;
         public DateTime Timestamp { get; set; }
-
         public Person EsoAsr { get; set; }
-
-        public TestLocation Location { get; set; }
         public Debrief Debrief { get; set; }
-
         public ObservableCollection<DiaryGoal> Goals { get; set; }
         public ObservableCollection<DiaryGoal> DvCheckList { get; set; }
 
@@ -46,9 +44,9 @@ namespace RevolveTestDiaryXf.Models
             set { this.RaiseAndSetIfChanged(ref newSessionTitle, value); }
         }
 
-        public TestDay(TestLocation location, Person esoAsr)
+        public TestDay(TrackWeatherService trackWeatherService, Person esoAsr)
         {
-            Location = location;
+            _trackWeatherService = trackWeatherService;
             Timestamp = DateTime.Now;
             EsoAsr = esoAsr;
             Debrief = new Debrief();
@@ -66,11 +64,10 @@ namespace RevolveTestDiaryXf.Models
             };
         }
 
-        public TestDay(DateTime timestamp, Person esoAsr, TestLocation location, Debrief debrief, ObservableCollection<DiaryGoal> goals, string newGoalBody, ObservableCollection<Session> sessions, string newSessionTitle)
+        public TestDay(DateTime timestamp, Person esoAsr, Debrief debrief, ObservableCollection<DiaryGoal> goals, string newGoalBody, ObservableCollection<Session> sessions, string newSessionTitle)
         {
             Timestamp = timestamp;
             EsoAsr = esoAsr;
-            Location = location;
             Debrief = debrief;
             Goals = goals;
             NewGoalBody = newGoalBody;
