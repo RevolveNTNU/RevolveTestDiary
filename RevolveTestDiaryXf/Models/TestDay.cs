@@ -9,14 +9,16 @@ using System.IO;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Uno.Extensions;
 
 namespace RevolveTestDiaryXf.Models
 {
     public class TestDay : ViewModelBase
     {
-        private readonly TrackWeatherService _trackWeatherService;
+        private TrackWeatherService _trackWeatherService;
         public DateTime Timestamp { get; set; }
         public Person EsoAsr { get; set; }
+        public string TestLocation { get; set; } = "";
         public Debrief Debrief { get; set; }
         public ObservableCollection<DiaryGoal> Goals { get; set; }
         public ObservableCollection<DiaryGoal> DvCheckList { get; set; }
@@ -44,11 +46,12 @@ namespace RevolveTestDiaryXf.Models
             set { this.RaiseAndSetIfChanged(ref newSessionTitle, value); }
         }
 
-        public TestDay(TrackWeatherService trackWeatherService, Person esoAsr)
+        public TestDay(TrackWeatherService trackWeatherService, string location)
         {
             _trackWeatherService = trackWeatherService;
             Timestamp = DateTime.Now;
-            EsoAsr = esoAsr;
+            EsoAsr = new Person("NONE");
+            TestLocation = location;
             Debrief = new Debrief();
             Debrief.TriggerAutoSaveEvent += TriggerAutoSaveFromDebrief;
 
@@ -80,6 +83,8 @@ namespace RevolveTestDiaryXf.Models
 
         }
 
+        public void InsertTrackWeatherService(TrackWeatherService trackWeatherService) => _trackWeatherService = trackWeatherService;
+
         public void AddGoalCommand()
         {
             var goal = new DiaryGoal(NewGoalBody);
@@ -96,11 +101,18 @@ namespace RevolveTestDiaryXf.Models
 
         public void AddSessionCommand()
         {
-            var session = new Session(NewSessionTitle);
+            var currentWeather = _trackWeatherService.GetCurrentWeatherForTown(TestLocation);
+            var session = new Session(NewSessionTitle, currentWeather, TestLocation);
             session.TriggerAutoSaveEvent += TriggerAutoSaveFromSession;
+            session.DeleteMeEvent += DeleteSession;
             NewSessionTitle = null;
             AddSession(session);
             TriggerAutoSaveEvent?.Invoke(this, this);
+        }
+
+        public void DeleteSession(object? sender, Session e)
+        {
+            Sessions.Remove(e);
         }
 
         public void TriggerAutoSaveFromSession(object? sender, Session e)
@@ -142,6 +154,8 @@ namespace RevolveTestDiaryXf.Models
             if (fileName == null)
                 return;
 
+            TryToUpdateWeatherForSessions();
+
             var stringBuilder = new StringBuilder();
 
             stringBuilder.AppendLine($"# {Timestamp}");
@@ -158,6 +172,10 @@ namespace RevolveTestDiaryXf.Models
             foreach (var session in Sessions)
             {
                 stringBuilder.AppendLine($"### {session.Timestamp} - {session.Title}");
+                if (session.IsWeatherLoaded)
+                {
+                    stringBuilder.AppendLine($"Location: {session.Location} - Weather: {session.Weather.Description} - Temp.: {session.Weather.Temperature.ToStringInvariant()}°C\n");
+                }
 
                 foreach (var entry in session.SessionEntries)
                 {
@@ -180,6 +198,17 @@ namespace RevolveTestDiaryXf.Models
             stringBuilder.AppendLine(Debrief.IssuesDiscovered);
 
             await File.WriteAllTextAsync(fileName, stringBuilder.ToString());
+        }
+
+        private void TryToUpdateWeatherForSessions()
+        {
+            foreach (var session in Sessions)
+            {
+                if (!session.IsWeatherLoaded)
+                {
+                    session.Weather = _trackWeatherService.GetHistoricWeatherForTown(session.Location, session.Timestamp.ToUnixTimeSeconds());
+                }
+            }
         }
     }
 }

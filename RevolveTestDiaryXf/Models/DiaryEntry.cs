@@ -10,6 +10,8 @@ namespace RevolveTestDiaryXf.Models
     {
         public DateTime Timestamp { get; set; }
         public event EventHandler<DiaryEntry> TriggerAutoSaveEvent;
+        public event EventHandler<DiaryEntry> DeleteMeEvent;
+
         public DiaryEntry(DateTime timestamp, EntryType entryType, string body)
         {
             Timestamp = timestamp;
@@ -36,11 +38,18 @@ namespace RevolveTestDiaryXf.Models
             set { _body = value; TriggerAutoSaveEvent?.Invoke(this, this); }
         }
 
+
         public DiaryEntry(EntryType entryType, string body)
         {
             Timestamp = DateTime.Now;
             EntryType = entryType;
             Body = body;
+        }
+
+
+        public void SelfDestructCommand()
+        {
+            DeleteMeEvent?.Invoke(this, this);
         }
     }
 }

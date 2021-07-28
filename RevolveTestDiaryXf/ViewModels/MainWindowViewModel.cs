@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -18,9 +19,26 @@ namespace RevolveTestDiaryXf.ViewModels
     {
         private readonly HttpClient client = new HttpClient();
 
-        private ObservableCollection<TestDay> testDays;
+        private ObservableCollection<TestDay> testDays = new ObservableCollection<TestDay>();
 
         private TrackWeatherService _trackWeatherService;
+
+        private string _location = "Trondheim";
+
+        public string Location
+        {
+            get { return _location; }
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _location, value);
+                foreach (var testDay in TestDays)
+                {
+                    testDay.TestLocation = value;
+                }
+            }
+        }
+
+        public ObservableCollection<string> Locations { get; set; }
 
         public ObservableCollection<TestDay> TestDays
         {
@@ -64,13 +82,13 @@ namespace RevolveTestDiaryXf.ViewModels
         {
             var envSetup = JsonSerializer.Deserialize<EnvSetup>(File.ReadAllText("Resources/setup.env"));
             _trackWeatherService = new TrackWeatherService(envSetup.OpenweatherKey);
-            var testDay = new TestDay(_trackWeatherService, new Person("ESO/ASR"));
+            Locations = new ObservableCollection<string>(_trackWeatherService.TownToCoordMap.Keys);
+            Location = Locations.FirstOrDefault();
+
+            var testDay = new TestDay(_trackWeatherService, Location);
             testDay.TriggerAutoSaveEvent += SaveTestDay;
             testDay.CloseTestDayEvent += CloseTestDay;
-            TestDays = new ObservableCollection<TestDay>
-            {
-                testDay
-            };
+            TestDays.Add(testDay);
         }
 
         public async void SaveTestDay(object sender, TestDay testDay)
@@ -118,13 +136,16 @@ namespace RevolveTestDiaryXf.ViewModels
                                 TestDay testDay = await JsonSerializer.DeserializeAsync(stream, typeof(TestDay)) as TestDay;
                                 testDay.TriggerAutoSaveEvent += SaveTestDay;
                                 testDay.CloseTestDayEvent += CloseTestDay;
+                                testDay.InsertTrackWeatherService(_trackWeatherService);
 
                                 foreach (var session in testDay.Sessions)
                                 {
                                     session.TriggerAutoSaveEvent += testDay.TriggerAutoSaveFromSession;
+                                    session.DeleteMeEvent += testDay.DeleteSession;
                                     foreach (var entry in session.SessionEntries)
                                     {
                                         entry.TriggerAutoSaveEvent += testDay.TriggerAutoSaveFromEntry;
+                                        entry.DeleteMeEvent += session.DeleteEntryCommand;
                                     }
                                 }
                                 foreach (var goal in testDay.Goals)
@@ -150,7 +171,7 @@ namespace RevolveTestDiaryXf.ViewModels
 
         public void NewDayCommand()
         {
-            var testDay = new TestDay(_trackWeatherService, new Person("ESO/ASR"));
+            var testDay = new TestDay(_trackWeatherService, Location);
             testDay.TriggerAutoSaveEvent += SaveTestDay;
             TestDays.Add(testDay);
         }

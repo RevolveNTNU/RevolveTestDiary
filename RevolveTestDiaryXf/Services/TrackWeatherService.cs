@@ -1,4 +1,8 @@
-﻿using System.Net;
+﻿using RevolveTestDiaryXf.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Text.Json;
 
 namespace RevolveTestDiaryXf.Services
@@ -8,6 +12,15 @@ namespace RevolveTestDiaryXf.Services
     /// </summary>
     public class TrackWeatherService
     {
+        public Dictionary<string, Tuple<double, double>> TownToCoordMap = new Dictionary<string, Tuple<double, double>>()
+        {
+            {"Værnes", new Tuple<double, double>(63.463558, 10.925606) },
+            {"EC Dahls", new Tuple<double, double>(63.440635, 10.429107) },
+            {"Dragvoll", new Tuple<double, double>(63.406310, 10.470311) },
+            {"Hockenheim", new Tuple<double, double>(49.330539, 8.564970) }
+        };
+
+
         private const int OPENWEATHERMAP_SUCCESS = 200;
 
         private string _apiKey;
@@ -22,44 +35,78 @@ namespace RevolveTestDiaryXf.Services
         /// </summary>
         /// <param name="town"></param>
         /// <returns>Returns the weather of the town</returns>
-        public Forecast GetTemperatureForTown(string town)
+        public Models.Weather GetCurrentWeatherForTown(string town)
         {
-            string rawJsonData;
-
-            using (var client = new WebClient())
+            if (town == null)
+                return new Models.Weather();
+            if (TownToCoordMap.TryGetValue(town, out var coords))
             {
+                string rawJsonData;
+
+                using (var client = new WebClient())
+                {
+                    try
+                    {
+                        // Use metric to get degrees Celcius
+                        rawJsonData = client.DownloadString($"http://api.openweathermap.org/data/2.5/weather?appid={_apiKey}&lat={coords.Item1}&lon={coords.Item2}&units=metric");
+                    }
+                    catch (WebException)
+                    {
+                        return new Models.Weather();
+                    }
+                }
+
+                OpenWeatherMapObjectCurrentWeather weatherMapObject;
                 try
                 {
-                    // Use metric to get degrees Celcius
-                    rawJsonData = client.DownloadString($"http://api.openweathermap.org/data/2.5/weather?appid={_apiKey}&q={town}&units=metric");
+                    weatherMapObject = JsonSerializer.Deserialize<OpenWeatherMapObjectCurrentWeather>(rawJsonData);
                 }
-                catch (WebException)
+                catch (JsonException)
                 {
-                    return new Forecast();
+                    return new Models.Weather();
+                }
+
+                if (weatherMapObject.cod == OPENWEATHERMAP_SUCCESS)
+                {
+                    return new Models.Weather() { Temperature = weatherMapObject.main.temp, Description = weatherMapObject.weather.First().description, IsLoaded = true };
                 }
             }
-
-            OpenWeatherMapObject weatherMapObject;
-            try
-            {
-                weatherMapObject = JsonSerializer.Deserialize<OpenWeatherMapObject>(rawJsonData);
-            }
-            catch (JsonException)
-            {
-                return new Forecast();
-            }
-
-            if (weatherMapObject.cod == OPENWEATHERMAP_SUCCESS)
-            {
-                return new Forecast() { Temperature = weatherMapObject.main.temp, Description = weatherMapObject.weather.description };
-            }
-            return new Forecast();
+            return new Models.Weather();
         }
 
-        public class Forecast
+        public Models.Weather GetHistoricWeatherForTown(string town, long unixTime)
         {
-            public double Temperature { get; set; }
-            public string Description { get; set; }
+            if (town == null)
+                return new Models.Weather();
+            if (TownToCoordMap.TryGetValue(town, out var coords))
+            {
+                string rawJsonData;
+
+                var url = $"https://api.openweathermap.org/data/2.5/onecall/timemachine?lat={coords.Item1}&lon={coords.Item2}&dt={unixTime}&appid={_apiKey}&units=metric";
+                using (var client = new WebClient())
+                {
+                    try
+                    {
+                        // Use metric to get degrees Celcius
+                        rawJsonData = client.DownloadString(url);
+                    }
+                    catch (WebException)
+                    {
+                        return new Models.Weather();
+                    }
+                }
+                OpenWeatherMapObjectHistoricWeather weatherMapObject;
+                try
+                {
+                    weatherMapObject = JsonSerializer.Deserialize<OpenWeatherMapObjectHistoricWeather>(rawJsonData);
+                    return new Models.Weather() { Temperature = weatherMapObject.current.temp, Description = weatherMapObject.current.weather.First().description, IsLoaded = true };
+                }
+                catch (JsonException)
+                {
+                    return new Models.Weather();
+                }
+            }
+            return new Models.Weather();
         }
 
         /// <summary>
@@ -68,13 +115,13 @@ namespace RevolveTestDiaryXf.Services
         /// easily expanded using the api docs: 
         /// https://openweathermap.org/current#current_JSON
         /// </summary>
-        private class OpenWeatherMapObject
+        private class OpenWeatherMapObjectCurrentWeather
         {
             public int cod { get; set; }
 
             public Main main { get; set; }
 
-            public Weather weather { get; set; }
+            public List<Weather> weather { get; set; }
         }
 
         /// <summary>
@@ -92,5 +139,18 @@ namespace RevolveTestDiaryXf.Services
         {
             public string description { get; set; }
         }
+
+
+        private class OpenWeatherMapObjectHistoricWeather
+        {
+            public Current current { get; set; }
+        }
+
+        private class Current
+        {
+            public double temp { get; set; }
+            public List<Weather> weather { get; set; }
+        }
+
     }
 }
