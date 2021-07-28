@@ -6,6 +6,7 @@ using Avalonia.Styling;
 using RevolveTestDiaryXf.ViewModels;
 using RevolveTestDiaryXf.Views;
 using System;
+using System.IO;
 using System.Net;
 
 namespace RevolveTestDiaryXf
@@ -97,10 +98,19 @@ namespace RevolveTestDiaryXf
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                desktop.MainWindow = new MainWindow
+                try
                 {
-                    DataContext = new MainWindowViewModel(),
-                };
+                    desktop.MainWindow = new MainWindow
+                    {
+                        DataContext = new MainWindowViewModel(),
+                    };
+                }
+                catch (Exception e)
+                {
+                    File.WriteAllText(@"C:\Users\Larsv\Desktop\avalonia_crash.txt", e.ToString());
+                    desktop.Shutdown();
+                }
+
             }
 
             base.OnFrameworkInitializationCompleted();

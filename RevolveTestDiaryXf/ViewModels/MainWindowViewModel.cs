@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text.Json;
 
 namespace RevolveTestDiaryXf.ViewModels
@@ -80,7 +81,7 @@ namespace RevolveTestDiaryXf.ViewModels
         public int TestPhaseId { get; set; }
         public MainWindowViewModel()
         {
-            var envSetup = JsonSerializer.Deserialize<EnvSetup>(File.ReadAllText("Resources/setup.env"));
+            var envSetup = JsonSerializer.Deserialize<EnvSetup>(File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Resources/setup.env")));
             _trackWeatherService = new TrackWeatherService(envSetup.OpenweatherKey);
             Locations = new ObservableCollection<string>(_trackWeatherService.TownToCoordMap.Keys);
             Location = Locations.FirstOrDefault();
