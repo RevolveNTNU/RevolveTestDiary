@@ -41,6 +41,7 @@
         <TextBlock Margin="10,0,0,0" FontSize="10" VerticalAlignment="Center">Test phase ID:</TextBlock>
         <TextBox Text="{Binding TestPhaseId}"  FontSize="10"  BorderThickness="0" Watermark="Phase ID" VerticalContentAlignment="Center"/>
         <Button Command="{Binding UploadTestDayToTestLog}" FontSize="10" BorderThickness="0" ToolTip.Tip="Ctrl+U">Upload selected TestDay</Button>
+        <ComboBox Items="{Binding Locations}" FontSize="10" SelectedItem="{Binding Location}"/>
       </StackPanel>
       <TabControl Items="{Binding TestDays}" SelectedItem="{Binding SelectedTestDay}" Grid.Row="1">
         <TabControl.ItemTemplate>
@@ -92,19 +93,36 @@
                     <ItemsControl.ItemTemplate>
                       <DataTemplate>
                         <Expander ExpandDirection="Down" Header="{Binding Title}" HorizontalContentAlignment="Stretch">
+                          <Expander.ContextMenu>
+                            <ContextMenu>
+                              <MenuItem Header="Delete" Command="{Binding SelfDestructCommand}"/>
+                            </ContextMenu>
+                          </Expander.ContextMenu>
                           <StackPanel Orientation="Vertical" Margin="20,0,0,0">
                             <ItemsControl Items="{Binding SessionEntries}">
                               <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                  <Grid >
+                                  <Grid>
                                     <Grid.ColumnDefinitions>
                                       <ColumnDefinition Width="*"/>
                                       <ColumnDefinition Width="*"/>
                                       <ColumnDefinition Width="5*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBox Text="{Binding TimestampString}" Grid.Column="0" BorderThickness="0"/>
+                                    <TextBox Text="{Binding TimestampString}" Grid.Column="0" BorderThickness="0">
+                                      <TextBox.ContextMenu>
+                                        <ContextMenu>
+                                          <MenuItem Header="Delete" Command="{Binding SelfDestructCommand}"/>
+                                        </ContextMenu>
+                                      </TextBox.ContextMenu>
+                                    </TextBox>
                                     <ComboBox Items="{Binding EntryTypes}" SelectedItem="{Binding EntryType}" Grid.Column="1" BorderThickness="0"/>
-                                    <TextBox Text="{Binding Body}" Grid.Column="2" BorderThickness="0"/>
+                                    <TextBox Text="{Binding Body}" Grid.Column="2" BorderThickness="0">
+                                      <TextBox.ContextMenu>
+                                        <ContextMenu>
+                                          <MenuItem Header="Delete" Command="{Binding SelfDestructCommand}"/>
+                                        </ContextMenu>
+                                      </TextBox.ContextMenu>
+                                    </TextBox>
                                   </Grid>
                                 </DataTemplate>
                               </ItemsControl.ItemTemplate>

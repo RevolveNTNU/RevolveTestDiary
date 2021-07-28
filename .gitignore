@@ -4,3 +4,5 @@ RevolveTestDiaryXf/bin/
 RevolveTestDiaryXf/obj/
 
 .vs/
+
+RevolveTestDiaryXf/Resources/setup.env
