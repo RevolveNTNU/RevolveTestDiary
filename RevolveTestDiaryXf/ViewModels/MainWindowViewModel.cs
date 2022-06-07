@@ -70,6 +70,7 @@ namespace RevolveTestDiaryXf.ViewModels
         }
 
         private string _dialogText;
+        private string _testLogBaseUrl;
 
         public string DialogText
         {
@@ -83,6 +84,7 @@ namespace RevolveTestDiaryXf.ViewModels
         {
             var envSetup = JsonSerializer.Deserialize<EnvSetup>(File.ReadAllText(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Resources/setup.env")));
             _trackWeatherService = new TrackWeatherService(envSetup.OpenweatherKey);
+            _testLogBaseUrl = envSetup.TestLogBaseUrl;
             Locations = new ObservableCollection<string>(_trackWeatherService.TownToCoordMap.Keys);
             Location = Locations.FirstOrDefault();
 
@@ -211,7 +213,7 @@ namespace RevolveTestDiaryXf.ViewModels
             var content = new FormUrlEncodedContent(data);
             try
             {
-                var response = await client.PostAsync("http://vault.revolve.no/testlog/register/exterallog/", content);
+                var response = await client.PostAsync($"{_testLogBaseUrl}testlog/register/exterallog/", content);
                 var status = response.StatusCode;
                 if (status == HttpStatusCode.Created)
                 {
